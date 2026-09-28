@@ -9,31 +9,25 @@ Unlike static inspection scripts, this system evaluates visual evidence dynamica
 ---
 
 ## 🏗️ System Architecture
-[ High-Res PCB Image / Stream ]
-│
-▼
-┌────────────────────────────────────────────────────────┐
-│ 1. Perception Layer (OpenCV 5)                         │
-│ - Pre-processing (Adaptive Thresholding, Denoising)    │
-│ - Defect Detection (Solder Bridges, Track Cracks)      │
-└─────────────────────────┬──────────────────────────────┘
-│ (Defect Metadata & Bounding Boxes)
-▼
-┌────────────────────────────────────────────────────────┐
-│ 2. Agentic Decision & Control Loop                     │
-│ - Evaluates defect confidence & severity               │
-│ - Dynamically triggers tool calls / actions             │
-└─────────────────────────┬──────────────────────────────┘
-│ (AWS SDK / Boto3 API Calls)
-▼
-┌────────────────────────────────────────────────────────┐
-│ 3. AWS Cloud Ecosystem Integration                     │
-│ - AWS S3: High-Res Defect Image Storage                │
-│ - AWS DynamoDB: Real-Time Quality Control Logs         │
-│ - AWS SNS / Lambda: Automated Alert Dispatch           │
-└─────────────────────────┴──────────────────────────────┘
+```mermaid
+graph TD
+    %% Custom Styling
+    classDef perception fill:#1f2937,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef agent fill:#111827,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef aws fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff;
 
-
+    A[📷 High-Res PCB Image Stream] --> B[🔍 1. Perception Layer: OpenCV 5]:::perception
+    B -->|Adaptive Threshold & Denoising| C[Detect Defect Contours & Severity]:::perception
+    
+    C -->|Defect Bounding Box & Metadata| D[🧠 2. Agentic Decision & Control Loop]:::agent
+    
+    D -->|High Severity Defect| E[🚨 Trigger AWS Alert Queue]:::agent
+    D -->|Low Severity Analytics| F[📊 Log Telemetry]:::agent
+    
+    E --> G[☁️ AWS SNS / Lambda Dispatch]:::aws
+    F --> H[🗄️ AWS DynamoDB Telemetry Store]:::aws
+    B -->|High-Res Crop| I[📦 AWS S3 Defect Vault]:::aws
+```
 ---
 
 ## ✨ Key Features
